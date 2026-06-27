@@ -1,0 +1,1392 @@
+---
+title: "C语言从入门到实战 · 完整教程"
+date: "2026-06-27"
+excerpt: "一文吃透C语言核心知识，从环境搭建到综合项目，每个专题均附带可运行的完整代码示例"
+tags: ["C语言", "编程基础", "系统编程", "指针"]
+---
+
+> 这是一份完整的 C 语言学习指南，涵盖从基础语法到高级特性的所有内容。建议边读边实践，亲手敲一遍代码才能真正掌握。
+
+---
+
+## 1. 环境搭建与第一个程序
+
+### 1.1 安装编译器
+
+**Windows**：下载 MinGW-w64 或安装 Code::Blocks
+
+验证安装：
+```bash
+gcc --version
+```
+
+**Linux/macOS**：自带 gcc/clang，终端直接可用。
+
+### 1.2 VS Code 配置（推荐）
+
+1. 安装 VSCode 扩展：**C/C++**（Microsoft）
+2. 创建 `.vscode/tasks.json` 编译配置，`Ctrl+Shift+B` 一键编译运行
+
+### 1.3 Hello World
+
+```c
+#include <stdio.h>   // 标准输入输出头文件
+
+// 程序入口：main 函数
+int main() {
+    printf("Hello, World!\n");    // \n 是换行符
+    return 0;                      // 返回 0 表示程序正常结束
+}
+```
+
+编译运行：
+```bash
+gcc hello.c -o hello    # 编译
+./hello                 # Linux/macOS 运行
+hello.exe               # Windows
+```
+
+> **关键理解**：`#include` 是预处理指令，把头文件内容"粘贴"进来；`main()` 是程序的唯一入口，操作系统从这里开始执行。
+
+---
+
+## 2. 数据类型与变量
+
+### 2.1 基本数据类型一览
+
+| 类型 | 关键字 | 字节数 | 范围 | 格式符 |
+|------|--------|--------|------|--------|
+| 字符 | `char` | 1 | -128 ~ 127 | `%c` |
+| 短整型 | `short` | 2 | -32768 ~ 32767 | `%hd` |
+| 整型 | `int` | 4 | -21亿 ~ 21亿 | `%d` |
+| 长整型 | `long` | 4/8 | 更大范围 | `%ld` |
+| 长长整型 | `long long` | 8 | -9×10¹⁸ ~ 9×10¹⁸ | `%lld` |
+| 单精度浮点 | `float` | 4 | 6-7位有效数字 | `%f` |
+| 双精度浮点 | `double` | 8 | 15-16位有效数字 | `%lf` |
+| 无符号整型 | `unsigned int` | 4 | 0 ~ 42亿 | `%u` |
+
+> **用 `sizeof()` 查看实际大小**，不同平台可能略有差异。
+
+### 2.2 变量声明与初始化
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 变量声明 =====
+    int age = 25;              // 声明同时初始化（推荐）
+    float salary = 12800.50;
+    char grade = 'A';          // 字符用单引号
+    double pi = 3.1415926535;
+
+    // ===== 一次声明多个 =====
+    int x = 10, y = 20, z;     // z 未初始化，值是随机的（垃圾值！）
+    z = x + y;                 // 先赋值再使用
+
+    // ===== 常量：值不可修改 =====
+    const float TAX_RATE = 0.13;   // const 常量
+    #define PI 3.14159             // 宏常量（无分号！预处理阶段替换）
+
+    // ===== 输出验证 =====
+    printf("年龄: %d\n", age);
+    printf("薪资: %.2f\n", salary);        // %.2f 保留2位小数
+    printf("等级: %c\n", grade);
+    printf("圆周率: %.10f\n", pi);
+
+    // sizeof 查看各类型占用的字节数
+    printf("int 占 %zu 字节\n", sizeof(int));
+    printf("double 占 %zu 字节\n", sizeof(double));
+    printf("char 占 %zu 字节\n", sizeof(char));
+
+    return 0;
+}
+```
+
+> **新手常见坑**：未初始化的变量值是内存中的随机垃圾值，使用前必须赋值！
+
+---
+
+## 3. 输入输出
+
+### 3.1 printf —— 格式化输出
+
+```c
+#include <stdio.h>
+
+int main() {
+    int id = 1001;
+    char name[] = "张三";       // 字符串用双引号，底层是字符数组
+    float score = 92.5;
+
+    // 基本格式化
+    printf("学号: %d | 姓名: %s | 成绩: %.1f\n", id, name, score);
+
+    // 控制宽度与对齐
+    printf("|%10d|\n", 123);     // 右对齐，占10位：|       123|
+    printf("|%-10d|\n", 123);    // 左对齐，占10位：|123       |
+    printf("|%010d|\n", 123);    // 用0填充：   |0000000123|
+
+    // 转义字符
+    printf("制表符:\t\t看我在哪\n");
+    printf("双引号: \"你好\"\n");
+    printf("反斜杠: \\ \n");
+
+    return 0;
+}
+```
+
+### 3.2 scanf —— 格式化输入（重点！）
+
+```c
+#include <stdio.h>
+
+int main() {
+    int age;
+    float height;
+    char name[50];      // 字符数组存储字符串
+
+    // ===== 输入 =====
+    printf("请输入姓名: ");
+    scanf("%s", name);          // ★ 字符串前面不需要 &，数组名本身就是地址
+
+    printf("请输入年龄: ");
+    scanf("%d", &age);          // ★ 普通变量必须加 & 取地址符
+
+    printf("请输入身高(m): ");
+    scanf("%f", &height);
+
+    // ===== 输出 =====
+    printf("\n--- 你的信息 ---\n");
+    printf("姓名: %s\n", name);
+    printf("年龄: %d\n", age);
+    printf("身高: %.2fm\n", height);
+
+    return 0;
+}
+```
+
+> **核心理解**：`scanf` 第二个参数是**地址**。普通变量用 `&` 取地址，数组名本身就是地址不用加 `&`。这是初学者最容易搞混的地方。
+
+### 3.3 getchar / putchar —— 单字符读写
+
+```c
+#include <stdio.h>
+
+int main() {
+    char ch;
+
+    printf("输入一个字符: ");
+    ch = getchar();
+
+    printf("你输入了: ");
+    putchar(ch);
+    putchar('\n');
+
+    return 0;
+}
+```
+
+---
+
+## 4. 运算符与表达式
+
+### 4.1 运算符分类
+
+```c
+#include <stdio.h>
+
+int main() {
+    int a = 10, b = 3;
+
+    // 算术运算符: + - * / %
+    printf("a + b = %d\n", a + b);    // 13
+    printf("a - b = %d\n", a - b);    // 7
+    printf("a * b = %d\n", a * b);    // 30
+    printf("a / b = %d\n", a / b);    // 3（★ 整数除法截断小数！）
+    printf("a %% b = %d\n", a % b);   // 1（取余，两个%%才能输出一个%）
+
+    // 浮点除法的正确方式
+    printf("a / (float)b = %.2f\n", a / (float)b);  // 3.33（至少一个转为float）
+
+    // 关系运算符: > < >= <= == != (结果为0或1)
+    printf("a > b 结果: %d\n", a > b);    // 1（真）
+    printf("a == b 结果: %d\n", a == b);  // 0（假）
+
+    // 逻辑运算符: && || !
+    printf("(a>5) && (b>5) = %d\n", (a>5) && (b>5));   // 1 && 0 = 0
+    printf("(a>5) || (b>5) = %d\n", (a>5) || (b>5));   // 1 || 0 = 1
+    printf("!(a > 5) = %d\n", !(a > 5));                 // !1 = 0
+
+    return 0;
+}
+```
+
+### 4.2 自增自减与复合赋值
+
+```c
+#include <stdio.h>
+
+int main() {
+    int x = 5;
+    int y;
+
+    // ★ 前置 vs 后置 ——面试高频考点
+    y = ++x;        // 前置：x先+1变成6，再赋给y → x=6, y=6
+    printf("++x → x=%d, y=%d\n", x, y);
+
+    x = 5;          // 重置
+    y = x++;        // 后置：x(5)先赋给y，x再+1 → x=6, y=5
+    printf("x++ → x=%d, y=%d\n", x, y);
+
+    // 复合赋值
+    int n = 10;
+    n += 3;    // 等价于 n = n + 3
+    printf("n += 3 → %d\n", n);
+    n *= 2;    // 等价于 n = n * 2
+    printf("n *= 2 → %d\n", n);
+
+    return 0;
+}
+```
+
+### 4.3 运算符优先级（简化记忆版）
+
+```
+高 → 低:
+  !   ++   --   (类型转换)      最高
+  *   /   %
+  +   -
+  <   <=   >   >=
+  ==   !=
+  &&
+  ||
+  =   +=   -=   *=   ...       最低
+```
+
+> **记不住就用括号**，`(a + b) * c` 比靠优先级靠谱一百倍。
+
+---
+
+## 5. 分支结构
+
+### 5.1 if-else
+
+```c
+#include <stdio.h>
+
+int main() {
+    int score;
+    printf("请输入成绩(0-100): ");
+    scanf("%d", &score);
+
+    // ===== 多分支判断 =====
+    if (score >= 90) {
+        printf("等级: A (优秀)\n");
+    } else if (score >= 80) {
+        printf("等级: B (良好)\n");
+    } else if (score >= 70) {
+        printf("等级: C (中等)\n");
+    } else if (score >= 60) {
+        printf("等级: D (及格)\n");
+    } else {
+        printf("等级: F (不及格，需要加油!)\n");
+    }
+
+    // ===== 三元运算符（简化 if-else） =====
+    // 语法: 条件 ? 表达式1 : 表达式2
+    int a = 10, b = 20;
+    int max = (a > b) ? a : b;
+    printf("max(%d, %d) = %d\n", a, b, max);
+
+    return 0;
+}
+```
+
+> **新手坑**：`if (a = 5)` 是赋值不是判断！应该写 `if (a == 5)`。用 `if (5 == a)` 的习惯可以防止这个bug（编译期就能发现 `5 = a` 报错）。
+
+### 5.2 switch-case
+
+```c
+#include <stdio.h>
+
+int main() {
+    int day;
+    printf("输入星期几(1-7): ");
+    scanf("%d", &day);
+
+    switch (day) {
+        case 1:
+            printf("星期一：制定周计划\n");
+            break;    // ★ 没有 break 会继续往下执行（穿透效果）！
+        case 2:
+            printf("星期二：全力编码\n");
+            break;
+        case 3:
+            printf("星期三：中期review\n");
+            break;
+        case 4:
+            printf("星期四：debug日\n");
+            break;
+        case 5:
+            printf("星期五：提交代码，准备周末\n");
+            break;
+        case 6:
+        case 7:            // 多个case共享同一代码块
+            printf("周末：休息，或写个人项目\n");
+            break;
+        default:
+            printf("输入错误，请输入1-7之间的数字\n");
+    }
+
+    return 0;
+}
+```
+
+> **关键**：`break` 用于跳出 switch，忘写会导致"穿透"到下一个 case。有时候故意不写 break 来实现多个 case 共享逻辑（如上面的6和7）。
+
+---
+
+## 6. 循环结构
+
+### 6.1 for 循环（最常用）
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 基础 for =====
+    printf("1到10: ");
+    for (int i = 1; i <= 10; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    // ===== 九九乘法表 =====
+    printf("\n--- 九九乘法表 ---\n");
+    for (int i = 1; i <= 9; i++) {
+        for (int j = 1; j <= i; j++) {
+            printf("%d×%d=%-2d ", j, i, i * j);  // %-2d 左对齐占2位
+        }
+        printf("\n");   // 每行结束换行
+    }
+
+    return 0;
+}
+```
+
+### 6.2 while 与 do-while
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== while：先判断再执行 =====
+    int count = 5;
+    printf("while 倒计时: ");
+    while (count > 0) {
+        printf("%d ", count);
+        count--;
+    }
+    printf("发射！\n");
+
+    // ===== do-while：至少执行一次，再判断 =====
+    int password;
+    do {
+        printf("请输入密码 (四位数字 1234): ");
+        scanf("%d", &password);
+    } while (password != 1234);
+
+    printf("密码正确，登陆成功！\n");
+
+    return 0;
+}
+```
+
+> **选择原则**：明确循环次数用 `for`；依赖条件退出用 `while`；至少执行一次用 `do-while`。
+
+### 6.3 break 与 continue
+
+```c
+#include <stdio.h>
+
+int main() {
+    // break：直接终止整个循环
+    printf("break 演示：遇到5就停 → ");
+    for (int i = 1; i <= 10; i++) {
+        if (i == 5) break;
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    // continue：跳过本次，继续下一次
+    printf("continue 演示：跳过5 → ");
+    for (int i = 1; i <= 10; i++) {
+        if (i == 5) continue;
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    return 0;
+}
+```
+
+---
+
+## 7. 数组
+
+### 7.1 一维数组
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 声明与初始化 =====
+    int arr[5] = {10, 20, 30, 40, 50};          // 全部初始化
+    int arr2[5] = {1, 2};                       // 部分初始化，剩余自动为0
+    int arr3[] = {7, 8, 9};                     // 不指定长度，编译器自动算
+
+    // ===== 遍历与修改 =====
+    printf("数组元素: ");
+    for (int i = 0; i < 5; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    arr[2] = 99;   // 修改第3个元素（索引从0开始！）
+    printf("修改后 arr[2] = %d\n", arr[2]);
+
+    // ===== 求最大值 =====
+    int scores[] = {85, 92, 78, 96, 83, 71};
+    int len = sizeof(scores) / sizeof(scores[0]);   // ★ 计算数组长度的方法
+    int max = scores[0];
+
+    for (int i = 1; i < len; i++) {
+        if (scores[i] > max) {
+            max = scores[i];
+        }
+    }
+    printf("最高分: %d (共%d个元素)\n", max, len);
+
+    return 0;
+}
+```
+
+> **`sizeof(arr) / sizeof(arr[0])`** 是计算数组元素个数的最常用技巧。
+
+### 7.2 二维数组
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 声明 =====
+    int matrix[3][4] = {
+        {1, 2, 3, 4},     // 第0行
+        {5, 6, 7, 8},     // 第1行
+        {9, 10, 11, 12}    // 第2行
+    };
+
+    // ===== 遍历（双层循环） =====
+    printf("3×4 矩阵:\n");
+    for (int i = 0; i < 3; i++) {           // 行
+        for (int j = 0; j < 4; j++) {       // 列
+            printf("%-4d", matrix[i][j]);
+        }
+        printf("\n");
+    }
+
+    // ===== 求每行总和 =====
+    for (int i = 0; i < 3; i++) {
+        int sum = 0;
+        for (int j = 0; j < 4; j++) {
+            sum += matrix[i][j];
+        }
+        printf("第%d行总和: %d\n", i + 1, sum);
+    }
+
+    return 0;
+}
+```
+
+---
+
+## 8. 字符串
+
+### 8.1 C语言字符串的本质
+
+```c
+#include <stdio.h>
+#include <string.h>    // 字符串函数头文件
+
+int main() {
+    // ★ C 语言没有内置 string 类型，字符串就是字符数组 + '\0' 结束符
+    char str1[6] = {'H', 'e', 'l', 'l', 'o', '\0'};   // 手动加结束符
+    char str2[] = "Hello";                              // 自动在末尾加 '\0'（推荐写法）
+
+    printf("str1: %s\n", str1);
+    printf("str2: %s\n", str2);
+    printf("str2 长度: %zu\n", strlen(str2));          // strlen 不算 '\0'
+    printf("str2 占用: %zu\n", sizeof(str2));          // sizeof 算 '\0'
+
+    return 0;
+}
+```
+
+> **核心理解**：`"Hello"` 在内存中实际占 **6** 个字节（H-e-l-l-o-\0），`\0` 是字符串的终止标记。
+
+### 8.2 常用字符串函数
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char s1[50] = "Hello";
+    char s2[] = "World";
+    char buffer[100];
+
+    // ----- 拷贝 -----
+    strcpy(buffer, s1);                 // 危险！不检查长度
+    strncpy(buffer, s2, 3);            // 安全版，最多拷贝n个
+    printf("strncpy 结果: %s\n", buffer);
+
+    // ----- 拼接 -----
+    strcpy(buffer, s1);
+    strcat(buffer, " ");               // 拼接（要确保buffer够大！）
+    strcat(buffer, s2);
+    printf("拼接结果: %s\n", buffer);
+
+    // ----- 比较 -----
+    // ★ 不能用 == 比较字符串！那是比较地址。必须用 strcmp
+    printf("'abc' vs 'abd': %d\n", strcmp("abc", "abd"));  // 负数，abc < abd
+    printf("'abc' vs 'abc': %d\n", strcmp("abc", "abc"));  // 0，相等
+    printf("'abd' vs 'abc': %d\n", strcmp("abd", "abc"));  // 正数，abd > abc
+
+    // ----- 长度 -----
+    printf("'%s' 的长度: %zu\n", buffer, strlen(buffer));
+
+    // ----- 查找字符 -----
+    char *pos = strchr(buffer, 'W');
+    if (pos != NULL) {
+        printf("'W' 出现位置（指针偏移）: %ld\n", pos - buffer);
+    }
+
+    // ----- 查找子串 -----
+    char *sub = strstr(buffer, "World");
+    if (sub != NULL) {
+        printf("找到子串 'World': %s\n", sub);
+    }
+
+    return 0;
+}
+```
+
+> **高频面试题**：`strcpy` vs `strncpy`？`strcpy` 不检查目标缓冲区大小，容易溢出，属于安全隐患；`strncpy` 限制拷贝长度，更安全。
+
+---
+
+## 9. 函数
+
+### 9.1 函数基础
+
+```c
+#include <stdio.h>
+
+// ----- 函数声明（原型） -----
+// 放在 main 前面或头文件中，告诉编译器有这个函数
+int add(int a, int b);          // 参数名可以省略: int add(int, int);
+float circle_area(float r);
+
+// ----- main -----
+int main() {
+    int result = add(3, 5);
+    printf("3 + 5 = %d\n", result);
+
+    float r = 2.5;
+    printf("半径为%.1f的圆面积: %.2f\n", r, circle_area(r));
+
+    return 0;
+}
+
+// ----- 函数定义 -----
+int add(int a, int b) {
+    return a + b;
+}
+
+float circle_area(float r) {
+    const float PI = 3.14159;
+    return PI * r * r;
+}
+```
+
+### 9.2 参数传递机制（值传递！）
+
+```c
+#include <stdio.h>
+
+// ★ C语言函数参数是"值传递" ——传的是变量的副本，不影响原变量！
+void swap_wrong(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp;
+    printf("swap_wrong 内部: a=%d, b=%d\n", a, b);
+}
+
+void swap_right(int *a, int *b) {    // 传地址（指针），间接修改原变量
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main() {
+    int x = 10, y = 20;
+
+    // 错误示范
+    swap_wrong(x, y);
+    printf("错误交换后: x=%d, y=%d (没变！)\n", x, y);
+
+    // 正确示范
+    swap_right(&x, &y);     // 传地址
+    printf("正确交换后: x=%d, y=%d (成功！)\n", x, y);
+
+    return 0;
+}
+```
+
+> **这是理解指针的关键动机**：要想在函数内修改外部变量，必须传递该变量的**地址**（指针）。
+
+### 9.3 递归函数
+
+```c
+#include <stdio.h>
+
+// 阶乘: n! = n × (n-1)!   且 0! = 1
+int factorial(int n) {
+    if (n <= 1) return 1;               // 递归终止条件（base case）
+    return n * factorial(n - 1);        // 递归调用
+}
+
+// 斐波那契: fib(n) = fib(n-1) + fib(n-2)  且 fib(0)=0, fib(1)=1
+int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+    printf("5! = %d\n", factorial(5));          // 120
+    printf("10! = %d\n", factorial(10));        // 3628800
+
+    printf("斐波那契数列前10项: ");
+    for (int i = 0; i < 10; i++) {
+        printf("%d ", fibonacci(i));            // 0 1 1 2 3 5 8 13 21 34
+    }
+    printf("\n");
+
+    return 0;
+}
+```
+
+> **递归核心**：① 终止条件（base case）；② 问题规模向终止条件收敛。缺少任何一条 = 无限递归 → 栈溢出。
+
+---
+
+## 10. 指针（核心难点）
+
+> 指针是C语言的灵魂，也是区分"会用C"和"真懂C"的分水岭。
+
+### 10.1 什么是指针
+
+```c
+#include <stdio.h>
+
+int main() {
+    int num = 42;          // 普通变量存值
+    int *p = &num;         // 指针变量存地址，p 指向 num
+
+    printf("num 的值: %d\n", num);        // 42
+    printf("num 的地址: %p\n", &num);     // 某个十六进制地址，如 0x7ffeea08
+    printf("p 中存的地址: %p\n", p);      // 和 &num 一样
+    printf("p 指向的值 (*p): %d\n", *p);  // 解引用：取出指向的值 → 42
+
+    // ★ 通过指针修改原变量的值
+    *p = 100;
+    printf("修改后 num = %d\n", num);     // 100（间接修改成功）
+
+    return 0;
+}
+```
+
+**内存模型图**：
+```
+变量名:    num                 p
+          ┌────            ┌──────────┐
+内存:     │ 42 │   ←←←←←    │ 0x7ffeea08│
+          └────┘            └──────────┘
+地址:  0x7ffeea08          0x7ffeea00
+```
+
+- `p` 存的是 `num` 的地址
+- `*p` 是**解引用**，沿着地址找到那个位置的数据
+- `&num` 是**取地址**，拿到 num 在内存中的门牌号
+
+### 10.2 指针与数组
+
+```c
+#include <stdio.h>
+
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+
+    // ★ 数组名 arr 就是指向首元素的指针（在某些上下文中）
+    printf("arr = %p, &arr[0] = %p\n", arr, &arr[0]);  // 两个地址相同
+
+    // ===== 三种等价的数组遍历方式 =====
+    // 方式1：下标
+    printf("下标法: ");
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
+
+    // 方式2：指针 + 偏移
+    printf("\n指针偏移: ");
+    for (int i = 0; i < 5; i++) printf("%d ", *(arr + i));   // arr[i] == *(arr+i)
+
+    // 方式3：移动指针
+    printf("\n指针移动: ");
+    for (int *p = arr; p < arr + 5; p++) printf("%d ", *p);
+
+    printf("\n");
+
+    return 0;
+}
+```
+
+> **核心公式**：`arr[i]` 等价于 `*(arr + i)`，编译器内部把下标访问翻译成指针运算。
+
+### 10.3 指针与字符串
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 方式1：字符数组（可修改！） =====
+    char str1[] = "Hello";
+    str1[0] = 'h';                  // ✅ 可以修改
+    printf("修改后: %s\n", str1);   // "hello"
+
+    // ===== 方式2：指针指向常量字符串（不可修改！） =====
+    char *str2 = "Hello";
+    // str2[0] = 'h';               // ❌ 段错误！字符串常量在只读区域
+    str2 = "World";                 // ✅ 可以让指针指向别的字符串
+    printf("指向: %s\n", str2);
+
+    // ===== 遍历字符串的指针写法 =====
+    char *s = "ABCD";
+    while (*s != '\0') {
+        printf("%c ", *s);
+        s++;
+    }
+    printf("\n");
+
+    return 0;
+}
+```
+
+### 10.4 多级指针
+
+```c
+#include <stdio.h>
+
+void updateValue(int **pp) {    // 二级指针：指向指针的指针
+    **pp = 999;                 // 两次解引用，修改到最底层的值
+}
+
+int main() {
+    int val = 100;
+    int *p = &val;      // 一级指针 → val
+    int **pp = &p;      // 二级指针 → p → val
+
+    printf("val=%d, *p=%d, **pp=%d\n", val, *p, **pp);  // 全是 100
+
+    updateValue(pp);    // 传二级指针
+    printf("修改后 val=%d\n", val);   // 999
+
+    return 0;
+}
+```
+
+**多级指针可视化**：
+```
+pp → p → val
+      ┌──────────┐      ┌──────────┐      ┌────┐
+      │ 0x...08  │  →   │ 0x...10  │  →   │ 999│
+      └──────────┘      └──────────┘      └────┘
+      pp (0x...00)      p  (0x...08)      val(0x...10)
+```
+
+### 10.5 函数指针（面试加分项）
+
+```c
+#include <stdio.h>
+
+// 两个被指向的函数
+int add(int a, int b)  { return a + b; }
+int multiply(int a, int b) { return a * b; }
+
+// 高阶函数：把函数当参数传
+int compute(int (*operation)(int, int), int x, int y) {
+    return operation(x, y);          // 调用传进来的函数
+}
+
+int main() {
+    // 声明函数指针: 返回类型 (*指针名)(参数类型列表)
+    int (*func_ptr)(int, int);
+
+    func_ptr = add;
+    printf("3 + 5 = %d\n", func_ptr(3, 5));     // 调用方式1
+
+    func_ptr = multiply;
+    printf("3 × 5 = %d\n", (*func_ptr)(3, 5));  // 调用方式2（解引用后调用）
+
+    // 高阶函数用法
+    printf("compute(add, 10, 20) = %d\n", compute(add, 10, 20));
+    printf("compute(multiply, 10, 20) = %d\n", compute(multiply, 10, 20));
+
+    return 0;
+}
+```
+
+---
+
+## 11. 结构体
+
+### 11.1 定义与使用
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+// ===== 定义结构体类型 =====
+struct Student {
+    int id;
+    char name[20];
+    int age;
+    float score;
+};          // ★ 分号不能少！
+
+int main() {
+    // ===== 创建结构体变量 =====
+    struct Student s1 = {1001, "张三", 20, 92.5};          // 按顺序初始化
+    struct Student s2 = {.id=1002, .name="李四", .score=88.0};  // 指定字段初始化
+
+    // ===== 访问成员：. 操作符 =====
+    printf("学号: %d, 姓名: %s, 年龄: %d, 成绩: %.1f\n",
+           s1.id, s1.name, s1.age, s1.score);
+
+    // ===== 修改成员 =====
+    s1.score = 95.0;
+    strcpy(s1.name, "张三丰");    // 字符串赋值必须用 strcpy
+
+    printf("修改后: %s 的成绩变为 %.1f\n", s1.name, s1.score);
+
+    return 0;
+}
+```
+
+### 11.2 结构体指针（重点！）
+
+```c
+#include <stdio.h>
+
+struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Point p = {10, 20};
+    struct Point *ptr = &p;      // 指向结构体的指针
+
+    // ===== 两种访问方式：-> 和 (*ptr). =====
+    printf("通过 -> : (%d, %d)\n", ptr->x, ptr->y);         // 推荐
+    printf("通过 (*). : (%d, %d)\n", (*ptr).x, (*ptr).y);  // 等价，但啰嗦
+
+    // 修改
+    ptr->x = 100;
+    ptr->y = 200;
+    printf("修改后: (%d, %d)\n", p.x, p.y);
+
+    return 0;
+}
+```
+
+> **`ptr->member` 是 `(*ptr).member` 的语法糖**，只用 `->` 就好。
+
+### 11.3 typedef 简化类型
+
+```c
+#include <stdio.h>
+
+// ===== 用 typedef 给结构体起别名 =====
+typedef struct {
+    char title[50];
+    char author[30];
+    int year;
+} Book;     // 以后直接用 Book，不需要写 struct xxx
+
+int main() {
+    Book b1 = {"C程序设计语言", "Kernighan & Ritchie", 1988};
+    Book b2 = {"C Primer Plus", "Stephen Prata", 2013};
+
+    printf("《%s》- %s (%d年)\n", b1.title, b1.author, b1.year);
+    printf("《%s》- %s (%d年)\n", b2.title, b2.author, b2.year);
+
+    return 0;
+}
+```
+
+---
+
+## 12. 动态内存分配
+
+> 前面用的数组大小都是在**编译时**确定的。动态内存让你在**运行时**按需分配，是写大程序的基础。
+
+### 12.1 malloc / calloc / free
+
+```c
+#include <stdio.h>
+#include <stdlib.h>      // malloc, calloc, free 的头文件
+
+int main() {
+    int n;
+    printf("你想存多少个学生的成绩? ");
+    scanf("%d", &n);
+
+    // ===== malloc：分配内存（内容未初始化，是垃圾值） =====
+    int *scores = (int *)malloc(n * sizeof(int));
+
+    // ★ 分配失败检查（好习惯！）
+    if (scores == NULL) {
+        printf("内存分配失败！\n");
+        return 1;
+    }
+
+    // 输入成绩
+    for (int i = 0; i < n; i++) {
+        printf("学生%d的成绩: ", i + 1);
+        scanf("%d", &scores[i]);
+    }
+
+    // 计算平均分
+    int sum = 0;
+    for (int i = 0; i < n; i++) sum += scores[i];
+    printf("平均分: %.2f\n", (float)sum / n);
+
+    // ★ 用完了必须释放！
+    free(scores);
+    scores = NULL;   // 防止野指针
+
+    return 0;
+}
+```
+
+### 12.2 realloc 与 calloc
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // calloc：分配并初始化为0（参数不同）
+    int *arr = (int *)calloc(5, sizeof(int));   // 5个int，全为0
+    printf("calloc 初始值: ");
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);  // 0 0 0 0 0
+    printf("\n");
+
+    // realloc：扩容/缩容（原数据保留）
+    arr = (int *)realloc(arr, 10 * sizeof(int));   // 扩到10个
+    printf("realloc 后: ");
+    for (int i = 0; i < 10; i++) printf("%d ", arr[i]);
+    printf("\n");
+
+    free(arr);
+    arr = NULL;
+    return 0;
+}
+```
+
+### 12.3 动态内存 vs 栈内存
+
+```c
+// ❌ 错误！返回局部变量的地址
+int* createArrayBad() {
+    int arr[10];       // 栈上分配，函数返回后内存就回收了！
+    return arr;        // 危险！返回悬空指针
+}
+
+// ✅ 正确！动态分配的内存在堆上，手动释放才回收
+int* createArrayGood(int n) {
+    int *arr = (int *)malloc(n * sizeof(int));
+    return arr;        // 安全，调用者记着 free
+}
+```
+
+| 特性 | 栈（Stack） | 堆（Heap） |
+|------|------------|-----------|
+| 分配方式 | 编译器自动 | `malloc` / `calloc` |
+| 释放方式 | 超出作用域自动释放 | 必须 `free`，否则内存泄漏 |
+| 大小限制 | 较小（通常几MB） | 受系统可用内存限制 |
+| 生命周期 | 函数内 | 手动控制 |
+
+> **黄金法则**：`malloc` 和 `free` 必须成对出现，就像 `new` 和 `delete` 在 C++ 中一样。谁分配，谁释放。
+
+---
+
+## 13. 文件操作
+
+### 13.1 写文件
+
+```c
+#include <stdio.h>
+
+int main() {
+    // ===== 打开文件 =====
+    FILE *fp = fopen("test.txt", "w");   // "w": 写模式，会覆盖已有内容
+    if (fp == NULL) {
+        printf("无法打开文件！\n");
+        return 1;
+    }
+
+    // ===== 写入 =====
+    fprintf(fp, "Hello, 文件!\n");       // 格式化写入（和 printf 用法一样）
+    fprintf(fp, "姓名: %s, 年龄: %d\n", "张三", 25);
+
+    // 也可以用 fputs 写字符串
+    fputs("这是第三行\n", fp);
+
+    // ★ 必须关闭！
+    fclose(fp);
+    printf("文件写入完成。\n");
+
+    return 0;
+}
+```
+
+### 13.2 读文件
+
+```c
+#include <stdio.h>
+
+int main() {
+    FILE *fp = fopen("test.txt", "r");   // "r": 读模式
+    if (fp == NULL) {
+        printf("文件不存在！请先运行写入程序。\n");
+        return 1;
+    }
+
+    // ===== 方式1：逐字符读取 =====
+    printf("--- 逐字符 ---\n");
+    char ch;
+    while ((ch = fgetc(fp)) != EOF) {    // EOF = End Of File
+        putchar(ch);
+    }
+
+    rewind(fp);    // 把文件指针倒回开头
+
+    // ===== 方式2：按行读取 =====
+    printf("\n--- 按行 ---\n");
+    char line[256];
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("读取: %s", line);  // fgets 取到的行自带 \n，不用再加
+    }
+
+    fclose(fp);
+    return 0;
+}
+```
+
+### 13.3 追加模式与读写模式总结
+
+| 模式 | 含义 | 文件不存在时 |
+|------|------|-------------|
+| `"r"` | 只读 | 返回 NULL |
+| `"w"` | 只写（覆盖） | 创建新文件 |
+| `"a"` | 追加（写末尾） | 创建新文件 |
+| `"r+"` | 读写 | 返回 NULL |
+| `"w+"` | 读写（覆盖） | 创建新文件 |
+| `"a+"` | 读 + 追加 | 创建新文件 |
+
+---
+
+## 14. 综合项目：学生成绩管理系统
+
+> 用前面所有知识点，写一个完整可运行的控制台程序。
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// ===== 结构体定义 =====
+typedef struct {
+    int id;
+    char name[30];
+    float chinese;
+    float math;
+    float english;
+    float average;
+} Student;
+
+// ===== 全局变量 =====
+Student *students = NULL;    // 动态数组
+int count = 0;               // 当前学生数量
+
+// ===== 函数声明 =====
+void menu();
+void addStudent();
+void deleteStudent();
+void showAll();
+void searchByName();
+void calcRanking();
+void saveToFile();
+void loadFromFile();
+
+// ===== 主函数 =====
+int main() {
+    int choice;
+
+    while (1) {
+        menu();
+        printf("请选择操作: ");
+        scanf("%d", &choice);
+        getchar();   // 吃掉回车
+
+        switch (choice) {
+            case 1: addStudent();    break;
+            case 2: deleteStudent(); break;
+            case 3: showAll();       break;
+            case 4: searchByName();  break;
+            case 5: calcRanking();   break;
+            case 6: saveToFile();    break;
+            case 7: loadFromFile();  break;
+            case 0:
+                printf("程序退出，再见！\n");
+                if (students != NULL) free(students);
+                return 0;
+            default:
+                printf("无效选项，请重新输入！\n");
+        }
+        printf("\n按回车继续...");
+        getchar();
+    }
+}
+
+void menu() {
+    printf("\n");
+    printf("╔══════════════════════════════╗\n");
+    printf("║    学生成绩管理系统 v1.0      \n");
+    printf("╠══════════════════════════════╣\n");
+    printf("║ 1. 添加学生                  ║\n");
+    printf("║ 2. 删除学生                  \n");
+    printf("║ 3. 显示全部                  ║\n");
+    printf("║ 4. 按姓名查找                ║\n");
+    printf("║ 5. 成绩排名                  ║\n");
+    printf("║ 6. 保存到文件                ║\n");
+    printf("║ 7. 从文件加载                ║\n");
+    printf("║ 0. 退出                      ║\n");
+    printf("══════════════════════════════╝\n");
+}
+
+void addStudent() {
+    // 扩容动态数组
+    count++;
+    students = (Student *)realloc(students, count * sizeof(Student));
+    if (students == NULL) {
+        printf("内存分配失败！\n");
+        exit(1);
+    }
+
+    Student *s = &students[count - 1];   // 指向新添加的位置
+    s->id = count;  // 自动编号
+
+    printf("姓名: ");    scanf("%s", s->name);
+    printf("语文: ");    scanf("%f", &s->chinese);
+    printf("数学: ");    scanf("%f", &s->math);
+    printf("英语: ");    scanf("%f", &s->english);
+
+    s->average = (s->chinese + s->math + s->english) / 3.0f;
+    printf("✅ 添加成功！%s 的平均分: %.1f\n", s->name, s->average);
+}
+
+void deleteStudent() {
+    int id;
+    printf("请输入要删除的学生编号: ");
+    scanf("%d", &id);
+
+    int index = -1;
+    for (int i = 0; i < count; i++) {
+        if (students[i].id == id) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1) {
+        printf("❌ 未找到该编号的学生。\n");
+        return;
+    }
+
+    // 把后面的元素往前移
+    for (int i = index; i < count - 1; i++) {
+        students[i] = students[i + 1];
+    }
+    count--;
+    students = (Student *)realloc(students, count * sizeof(Student));
+    printf("✅ 删除成功！\n");
+}
+
+void showAll() {
+    if (count == 0) {
+        printf("暂无学生数据。\n");
+        return;
+    }
+
+    printf("\n┌──────┬──────────┬──────┬──────┬──────┬──────┐\n");
+    printf("│ 编号 │   姓名   │ 语文 │ 数学 │ 英语 │ 平均 │\n");
+    printf("├──────┼──────────┼──────┼──────┼──────┼──────┤\n");
+    for (int i = 0; i < count; i++) {
+        printf("│ %4d │ %-8s │ %4.1f│ %4.1f│ %4.1f│ %4.1f│\n",
+            students[i].id,
+            students[i].name,
+            students[i].chinese,
+            students[i].math,
+            students[i].english,
+            students[i].average
+        );
+    }
+    printf("└──────┴──────────┴──────┴──────┴──────┴──────┘\n");
+    printf("共 %d 名学生\n", count);
+}
+
+void searchByName() {
+    char keyword[30];
+    printf("请输入姓名: ");
+    scanf("%s", keyword);
+
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (strstr(students[i].name, keyword) != NULL) {   // 模糊匹配
+            printf("找到: [%d] %s | 语文:%.1f 数学:%.1f 英语:%.1f 平均:%.1f\n",
+                students[i].id,
+                students[i].name,
+                students[i].chinese,
+                students[i].math,
+                students[i].english,
+                students[i].average);
+            found++;
+        }
+    }
+    if (!found) printf("❌ 未找到匹配的学生。\n");
+}
+
+void calcRanking() {
+    if (count == 0) {
+        printf("暂无学生数据。\n");
+        return;
+    }
+
+    // 冒泡排序（按平均分降序）
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - 1 - i; j++) {
+            if (students[j].average < students[j + 1].average) {
+                Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\n🏆 成绩排名:\n");
+    for (int i = 0; i < count; i++) {
+        const char *medal = "";
+        if (i == 0) medal = "";
+        else if (i == 1) medal = "🥈";
+        else if (i == 2) medal = "";
+        printf("%s 第%d名: %s (平均 %.1f)\n",
+            medal, i + 1, students[i].name, students[i].average);
+    }
+}
+
+void saveToFile() {
+    FILE *fp = fopen("students.txt", "w");
+    if (fp == NULL) {
+        printf(" 无法创建文件！\n");
+        return;
+    }
+
+    // 第一行存学生总数
+    fprintf(fp, "%d\n", count);
+    for (int i = 0; i < count; i++) {
+        fprintf(fp, "%d %s %.2f %.2f %.2f\n",
+            students[i].id,
+            students[i].name,
+            students[i].chinese,
+            students[i].math,
+            students[i].english);
+    }
+    fclose(fp);
+    printf("✅ 已保存 %d 条记录到 students.txt\n", count);
+}
+
+void loadFromFile() {
+    FILE *fp = fopen("students.txt", "r");
+    if (fp == NULL) {
+        printf("❌ 文件不存在！\n");
+        return;
+    }
+
+    if (students != NULL) {
+        free(students);
+        students = NULL;
+    }
+
+    fscanf(fp, "%d", &count);
+    students = (Student *)malloc(count * sizeof(Student));
+
+    for (int i = 0; i < count; i++) {
+        fscanf(fp, "%d %s %f %f %f",
+            &students[i].id,
+            students[i].name,
+            &students[i].chinese,
+            &students[i].math,
+            &students[i].english);
+        students[i].average = (students[i].chinese + students[i].math + students[i].english) / 3.0f;
+    }
+
+    fclose(fp);
+    printf("✅ 已从文件加载 %d 条记录\n", count);
+}
+```
+
+**编译运行**：
+```bash
+gcc student_system.c -o student_system
+./student_system
+```
+
+---
+
+## 附录：C语言核心错误排雷表
+
+| 常见错误 | 原因 | 修复 |
+|----------|------|------|
+| `if (a = 5)` | 赋值当作判断 | 改为 `if (a == 5)` 或 `if (5 == a)` |
+| `scanf("%d", var)` | 漏了 `&` | 改为 `scanf("%d", &var)` |
+| `scanf("%s", &str)` | 字符串多加了 `&` | 改为 `scanf("%s", str)` |
+| `char *s`; `strcpy(s, "hi")` | 野指针，未分配空间 | 先 `malloc` 或改为数组 |
+| `malloc` 后不 `free` | 内存泄漏 | 用完 `free`，指针置 `NULL` |
+| 数组越界 `arr[10]`（声明了10个） | 最大索引是 9 不是 10 | 循环写 `i < 10` 而非 `i <= 10` |
+| `strcmp(s1, s2)` 判断相等写 `== 0` | 忘写 `== 0` | `strcmp` 返回0才表示相等 |
+| `int *p = &x`; `p++` 后忘记 | 指针移走了 | 保留原始指针，或用偏移 `*(p+i)` |
+
+---
+
+> 📌 **学习建议**：把这份教程里的每个代码块都亲手敲一遍，不要复制粘贴。每段代码末尾都有编译运行注释，自己编译运行，改一改参数看看效果。编程是练会的，不是看会的。
