@@ -10,6 +10,8 @@ export interface PostMeta {
   date: string;
   excerpt: string;
   tags: string[];
+  wordCount?: number;
+  readingTime?: number;
 }
 
 export function getAllPosts(): PostMeta[] {
@@ -24,12 +26,19 @@ export function getAllPosts(): PostMeta[] {
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data } = matter(fileContents);
 
+      const content = matter(fileContents).content;
+      const wordCount = content.split(/\s+/).filter(Boolean).length;
+      // 假设平均阅读速度为 200 字/分钟
+      const readingTime = Math.ceil(wordCount / 200);
+
       return {
         slug,
         title: data.title || slug,
         date: data.date || "",
         excerpt: data.excerpt || "",
         tags: data.tags || [],
+        wordCount,
+        readingTime,
       };
     });
 
@@ -47,6 +56,8 @@ export function getPostBySlug(slug: string) {
   
   const fileContents = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(fileContents);
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const readingTime = Math.ceil(wordCount / 200);
 
   return {
     slug,
@@ -55,5 +66,7 @@ export function getPostBySlug(slug: string) {
     excerpt: data.excerpt || "",
     tags: data.tags || [],
     content,
+    wordCount,
+    readingTime,
   };
 }

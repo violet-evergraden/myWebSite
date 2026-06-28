@@ -36,7 +36,7 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Hide Next.js Dev Tools Badge - 最强力隐藏 */
+/* Hide Next.js Dev Tools Badge */
 [data-next-badge-root],
 [data-next-badge],
 #next-logo,
@@ -44,7 +44,21 @@
 [data-dot],
 div[data-next-badge-root] *,
 button[id^="next"],
-svg[id^="next"] {
+svg[id^="next"],
+a[href*="nextjs.org"],
+iframe[src*="nextjs.org"],
+/* 针对左下角圆形 N 图标 */
+div[style*="bottom: 0"][style*="left: 0"],
+div[style*="position: fixed"][style*="bottom"],
+div[style*="position:fixed"][style*="bottom"],
+/* 所有包含 next 的元素 */
+*[id*="next-badge"],
+*[class*="next-badge"],
+*[data-testid*="next"],
+/* 强制隐藏 */
+.nextjs-toast,
+.nextjs-container-portal,
+#__next-build-watcher {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -58,6 +72,7 @@ svg[id^="next"] {
   top: -9999px !important;
   overflow: hidden !important;
   clip-path: inset(100%) !important;
+  z-index: -9999 !important;
 }
 
 /* Style select dropdown options */
@@ -76,12 +91,12 @@ body {
 
 /* Liquid Glass Effect */
 .glass {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--glass-border);
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 8px 32px var(--glass-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 

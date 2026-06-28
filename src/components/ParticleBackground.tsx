@@ -51,18 +51,5 @@ function Particles({ count = 200 }: { count?: number }) {
 }
 
 export default function ParticleBackground() {
-  return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 60 }}
-        dpr={[1, 1.5]}
-        gl={{ alpha: true, antialias: false }}
-      >
-        <Particles />
-        <ambientLight intensity={0.5} />
-      </Canvas>
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0f]/50 to-[#0a0a0f]" />
-    </div>
-  );
+  return null; // 禁用粒子效果以提升性能
 }
