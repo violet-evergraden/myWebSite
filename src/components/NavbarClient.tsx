@@ -100,9 +100,9 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
         isScrolled ? "glass-strong" : "glass"
       } rounded-2xl px-8 py-3 w-[900px] max-w-[90vw]`}
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-8">
         {/* Logo */}
-        <Link href="/" className="mr-auto group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3">
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -116,10 +116,47 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
               className="object-cover"
             />
           </motion.div>
-          <span className="hidden md:block text-white/90 font-medium text-sm whitespace-nowrap">
+          <span className="hidden md:block text-white/90 font-medium text-sm whitespace-nowrap z-50 relative">
             Sora の 小站
           </span>
         </Link>
+
+        {/* Navigation Menu with Smooth Animation */}
+        <div className="flex items-center gap-6 ml-4">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="relative group py-1"
+              >
+                <span
+                  className={`text-sm font-medium transition-colors duration-200 ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white/90"
+                  }`}
+                >
+                  {item.label}
+                </span>
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-indicator"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#39d6c6] rounded-full"
+                    initial={{ opacity: 0, scaleX: 0.5 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.5 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 500, 
+                      damping: 30,
+                      duration: 0.2 
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
 
         {/* Search Box - Direct Input */}
         <div className="ml-auto w-64 md:w-80 relative">

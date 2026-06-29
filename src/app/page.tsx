@@ -5,6 +5,11 @@ import FeatureCards from "@/components/FeatureCards";
 
 export default function Home() {
   const posts = getAllPosts();
+  
+  // 获取所有标签并去重
+  const allTags = Array.from(
+    new Set(posts.flatMap((post) => post.tags))
+  ).sort();
 
   return (
     <div className="relative min-h-screen pt-24 pb-20">
@@ -28,7 +33,7 @@ export default function Home() {
         <HomeHero />
 
         {/* Feature Cards Grid */}
-        <FeatureCards />
+        <FeatureCards tags={allTags} />
 
         {/* Latest Notes */}
         {posts.length > 0 && (
@@ -38,7 +43,7 @@ export default function Home() {
             </h2>
             
             <div className="grid gap-4">
-              {posts.slice(0, 3).map((post) => (
+              {posts.slice(0, 5).map((post) => (
                 <BlogCard
                   key={post.slug}
                   title={post.title}

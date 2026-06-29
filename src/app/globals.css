@@ -48,6 +48,27 @@ svg[id^="next"],
 a[href*="nextjs.org"],
 iframe[src*="nextjs.org"],
 /* 针对左下角圆形 N 图标 */
+div[class*="_badge"] {
+  display: none !important;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
 div[style*="bottom: 0"][style*="left: 0"],
 div[style*="position: fixed"][style*="bottom"],
 div[style*="position:fixed"][style*="bottom"],

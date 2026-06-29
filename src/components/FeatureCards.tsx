@@ -2,9 +2,29 @@
 
 import { motion } from "framer-motion";
 
-export default function FeatureCards() {
+interface FeatureCardsProps {
+  tags: string[];
+}
+
+export default function FeatureCards({ tags }: FeatureCardsProps) {
   return (
     <section className="mb-32 max-w-[900px] mx-auto">
+      {/* Tag Marquee Scroll Bar */}
+      <div className="mb-8 overflow-hidden">
+        <div className="marquee-track flex w-max gap-3">
+          {/* Duplicate tags for seamless loop */}
+          {[...tags, ...tags].map((tag, index) => (
+            <span
+              key={`${tag}-${index}`}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 glass px-4 py-1.5 text-xs font-medium text-white/60 whitespace-nowrap"
+            >
+              <span className="h-1 w-1 rounded-full bg-neutral-600" />
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
       <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
         探索领域
       </h2>
