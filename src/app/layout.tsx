@@ -20,6 +20,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Konata の 小站",
   description: "个人博客 - 学习笔记与交互实验",
+  icons: {
+    icon: [{ url: '/favicon.ico' }],
+    apple: [{ url: '/favicon.ico' }],
+  },
 };
 
 export default function RootLayout({
