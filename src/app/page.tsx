@@ -2,6 +2,7 @@ import { getAllPosts } from "@/lib/posts";
 import BlogCard from "@/components/BlogCard";
 import HomeHero from "@/components/HomeHero";
 import FeatureCards from "@/components/FeatureCards";
+import ResponsiveBackground from "@/components/ResponsiveBackground";
 
 export default function Home() {
   const posts = getAllPosts();
@@ -13,15 +14,10 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen pt-24 pb-20">
-      {/* Background Image */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(/images/default.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center right',
-          backgroundRepeat: 'no-repeat',
-        }}
+      {/* Responsive Background Image */}
+      <ResponsiveBackground
+        desktopImage="/images/default.png"
+        mobileImage="/images/photo_show.png"
       />
       
       {/* Dark overlay */}

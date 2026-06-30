@@ -26,6 +26,7 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -100,9 +101,9 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
         isScrolled ? "glass-strong" : "glass"
       } rounded-2xl px-8 py-3 w-[900px] max-w-[90vw]`}
     >
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-4 md:gap-8">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3 shrink-0">
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -121,45 +122,8 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
           </span>
         </Link>
 
-        {/* Navigation Menu with Smooth Animation */}
-        <div className="flex items-center gap-6 ml-4">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="relative group py-1"
-              >
-                <span
-                  className={`text-sm font-medium transition-colors duration-200 ${
-                    isActive ? "text-white" : "text-white/60 hover:text-white/90"
-                  }`}
-                >
-                  {item.label}
-                </span>
-                {isActive && (
-                  <motion.div
-                    layoutId="active-nav-indicator"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#39d6c6] rounded-full"
-                    initial={{ opacity: 0, scaleX: 0.5 }}
-                    animate={{ opacity: 1, scaleX: 1 }}
-                    exit={{ opacity: 0, scaleX: 0.5 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 500, 
-                      damping: 30,
-                      duration: 0.2 
-                    }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Search Box - Direct Input */}
-        <div className="ml-auto w-64 md:w-80 relative">
+        {/* Search Box - Center on mobile, right on desktop */}
+        <div className="flex-1 max-w-xs md:max-w-md mx-auto md:mx-0 relative">
           <div className="relative glass rounded-xl overflow-hidden">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
@@ -264,7 +228,107 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Desktop Navigation Menu */}
+        <div className="hidden md:flex items-center gap-6">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="relative group py-1"
+              >
+                <span
+                  className={`text-sm font-medium transition-colors duration-200 ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white/90"
+                  }`}
+                >
+                  {item.label}
+                </span>
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-indicator"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#39d6c6] rounded-full"
+                    initial={{ opacity: 0, scaleX: 0.5 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.5 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 500, 
+                      damping: 30,
+                      duration: 0.2 
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          <svg
+            className="w-6 h-6 text-white/80"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {isMobileMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-4 pt-4 border-t border-white/10 md:hidden"
+          >
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="py-2 px-3 rounded-lg transition-colors hover:bg-white/5"
+                  >
+                    <span
+                      className={`text-sm font-medium ${
+                        isActive ? "text-white" : "text-white/60"
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }

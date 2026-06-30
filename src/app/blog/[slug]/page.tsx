@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import BlogSidebar from "@/components/BlogSidebar";
 import ReadingProgress from "@/components/ReadingProgress";
+import ResponsiveBackground from "@/components/ResponsiveBackground";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism-plus";
@@ -45,15 +46,10 @@ export default async function BlogPostPage({
     
     return (
       <div className="relative min-h-screen">
-        {/* Background Image */}
-        <div 
-          className="fixed inset-0 z-0"
-          style={{
-            backgroundImage: 'url(/images/default.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center right',
-            backgroundRepeat: 'no-repeat',
-          }}
+        {/* Responsive Background Image */}
+        <ResponsiveBackground
+          desktopImage="/images/default.png"
+          mobileImage="/images/photo_show.png"
         />
         
         {/* Dark overlay */}

@@ -2,6 +2,7 @@
 
 import BlogCard from "@/components/BlogCard";
 import AnimatedText from "@/components/AnimatedText";
+import ResponsiveBackground from "@/components/ResponsiveBackground";
 import { useState, useMemo } from "react";
 
 interface PostItem {
@@ -30,15 +31,10 @@ export default function BlogListClient({ posts }: { posts: PostItem[] }) {
 
   return (
     <div className="relative min-h-screen pt-32 pb-20 px-6">
-      {/* Background */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(/images/default.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center right',
-          backgroundRepeat: 'no-repeat',
-        }}
+      {/* Responsive Background */}
+      <ResponsiveBackground
+        desktopImage="/images/default.png"
+        mobileImage="/images/photo_show.png"
       />
       <div className="fixed inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent z-5" />
 
