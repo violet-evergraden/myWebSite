@@ -110,7 +110,7 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
             className="w-8 h-8 rounded-lg overflow-hidden"
           >
             <Image
-              src="/images/logo.png"
+              src="/images/icon.png"
               alt="Logo"
               width={32}
               height={32}
