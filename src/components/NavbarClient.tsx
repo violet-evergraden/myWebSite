@@ -117,7 +117,7 @@ export default function NavbarClient({ posts }: { posts: PostItem[] }) {
             />
           </motion.div>
           <span className="hidden md:block text-white/90 font-medium text-sm whitespace-nowrap z-50 relative">
-            Sora の 小站
+            Konata の 小站
           </span>
         </Link>
 

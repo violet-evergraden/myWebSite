@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sora の 小站",
+  title: "Konata の 小站",
   description: "个人博客 - 学习笔记与交互实验",
   icons: {
     icon: "/images/logo.png",

@@ -24,7 +24,7 @@ export default function HomeHero() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight"
         >
-          <span className="text-white">Kasugano Sora</span>
+          <span className="text-white">Izumi Konata</span>
           <br />
           <span className="text-gradient">の 积微成著</span>
         </motion.h1>
@@ -54,7 +54,7 @@ export default function HomeHero() {
               className="glass-strong rounded-2xl px-8 py-3.5 text-sm font-medium text-white 
                          hover:bg-white/15 transition-all anime-glow"
             >
-              查看Sora的笔记
+              查看Konata的笔记
             </motion.button>
           </Link>
         </motion.div>
